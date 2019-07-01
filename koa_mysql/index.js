@@ -30,7 +30,18 @@ let Pet = sequelize.define('pet',{
 
 var now = Date.now();
 
-Pet.create({
+// 向数据库中添加数据(增)
+function addPet(pet) {
+    Pet.create(pet)
+       .then(p => {
+          console.log('created.' + JSON.stringify(p));
+       })
+       .catch(err => {
+          console.log('failed: ' + err);
+       });
+}
+
+let pet = {
     id: 'g-' + now,
     name: 'Gaffey',
     gender: false,
@@ -38,8 +49,64 @@ Pet.create({
     createdAt: now,
     updatedAt: now,
     version: 0
-}).then(function (p) {
-    console.log('created.' + JSON.stringify(p));
-}).catch(function (err) {
-    console.log('failed: ' + err);
-});
+}
+
+// 查询Pet(查)
+async function queryPet(value){
+    let pets = [];
+    if(value) {
+        pets = await Pet.findAll({
+            where: {
+                name: value
+            }
+        })
+
+        return pets;
+    }else {
+        pets = await Pet.findAll();
+    }
+
+    for(let pet of pets) {
+        console.log(JSON.stringify(pet))
+    }
+}
+
+// 更新Pet(改)
+async function updatePet(pet) {
+    let p = await queryPet("Garyhu");
+
+    console.log(JSON.stringify(p))
+    let res = p[0];
+    res.gender = pet.gender;
+    res.updatedAt = pet.updatedAt;
+    res.version = pet.version;
+
+    await res.save();
+}
+
+// 删除某条数据(删)
+async function deletePet(id) {
+    let res = await Pet.findAll({
+        where: {
+            id: id
+        }
+    });
+
+    let p = res[0];
+
+    await p.destroy();
+}
+
+// addPet(pet);
+
+// queryPet();
+
+let updateP = {
+    gender: true,
+    version: 1,
+    updatedAt: Date.now()
+}
+
+// updatePet(updateP);
+
+deletePet("g-1561983506188");
