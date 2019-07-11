@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
     port : "3306",
     database : "websites",
     user : "root",
-    password : "lyyahww09081020"
+    password : "*****"
 });
 
 app.get("/",(req,res) => {
