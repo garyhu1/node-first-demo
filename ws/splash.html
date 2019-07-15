@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+    <title>splash</title>
+    <style type="">
+        * {
+          margin: 0px;
+          padding: 0px;
+        }
+
+        html,body {
+          width:100%;height:100%
+        }
+
+        .loading-layout {
+            background-color: #FFF;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .layout_1, .layout_2 {
+          display: none;
+        }
+
+        .btn_layout {
+          width: 100%;
+          height: 45px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          background-color: #fff;
+        }
+
+        .btn {
+          height: 30px;
+          text-align: center;
+          line-height: 30px;
+          width: 80px;
+          border-radius: 3px;
+          border: 1px solid #111;
+        }
+
+        #caseMarron{
+          height:2rem;
+          width:3.5rem;
+          padding-top:10px;
+          float:left;
+          position:absolute;
+          left:50%;
+          top:50%;
+          transform:translate(-50%,-65%)
+        }
+        #caseMarron #load{
+          color:gray;
+          font-family:calibri;
+          text-align:center;
+          margin-top:50px
+        }
+        #caseMarron #load p{
+          font-size:.35rem
+        }
+
+        #boule{
+          height:.2rem;
+          width:.2rem;
+          position:absolute;
+          top:60%;
+          left:0;
+          background-color:gray;
+          border-radius:50%;
+          animation:boule 2s infinite;
+          -webkit-animation:boule 2s infinite
+        }
+
+        @keyframes boule{
+          0%{
+            left:0rem;
+            opacity:0
+          }
+          50%{
+            height:.2rem;
+            width:.2rem;
+            opacity:1
+          }
+          100%{
+            left:3.5rem;
+            opacity:0;
+            height:.2rem;
+            width:.2rem
+          }
+        }
+        @-webkit-keyframes boule{
+          0%{
+            left:0rem;
+            opacity:0
+          }
+          50%{
+            opacity:1
+          }
+          100%{
+            left:100%;
+            opacity:0
+          }
+        }
+    </style>
+  </head>
+  <body>
+    <!--open为true时显示-->
+    <!-- <div class="loading-layout div-layout">
+      <p style="font-size: 14px;">loading...</p>
+      <div id="boule"></div>
+    </div> -->
+    <div id="caseMarron">
+      <div id="boule"></div>
+      <div id="load">
+        <p>loading ...</p>
+      </div>
+    </div>
+    <!--open为true时显示-->
+    <div class="layout_1 div-layout">
+      <iframe width="100%" height="100%" frameborder="0" scrolling="no" id="succ_content"></iframe>
+    </div>
+    <!--open为false时显示-->
+    <div class="layout_2 div-layout">
+      <div style="-webkit-overflow-scrolling: touch;overflow-y: scroll; width: 100%; height: 100%;">
+        <iframe width="100%" height="100%" frameborder="0" id="fail_content"></iframe>
+      </div>
+      <div class="btn_layout" id="nextBtn">
+        <p class="btn">跳过</p>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    function getPage() {
+      // 网络请求
+      $.ajax({
+        url:"http://mock-api.com/J6KLk6nk.mock/aabbb",
+        success: result => {
+          // alert('ok')
+          setTimeout(() => {
+            $('#caseMarron').css('display','none');
+          },1000);
+          
+          console.log(JSON.stringify(result));
+          if(result){
+            result.open = false;
+            if(result.open){
+              let contentUrl = result.url;
+              $('#succ_content').attr('src',contentUrl);
+              $('.layout_1').css('display','block');
+            }else {
+              let contentUrl = 'https://shimo.im/docs/Tlb557V6gToK3KMy/';
+              $('#fail_content').attr('src',contentUrl);
+              $('.layout_2').css('display','block');
+            }
+          }
+        },
+        error: err => {
+          alert("请求失败");
+        },
+        complete: () => {
+
+        }
+      });
+    }
+
+    $(document).ready(function(){
+      // 设置高度
+      $('.div-layout').css('height',window.screen.height);
+      $('body').on('touchmove',function(e){
+        e.preventDefault();
+      });
+      
+      // 展示
+      getPage();
+
+      $('#nextBtn').click(() => {
+        //判断是ios还是android的方法
+        var u = navigator.userAgent.toLowerCase();
+        var isApple = /(iphone|ipad|ipod|ios)/i.test(u);
+        var isAndroid = /android/i.test(u);
+        
+        if (isApple) {
+            //apple终端
+            window.location = 'jumpOut://';
+        } else if (isAndroid) {
+            //安卓终端
+            Mobile.jumpOut();
+        }
+      })
+
+      window.ononline = function() {
+        getPage();
+      }
+    });
+  </script>
+</html>
