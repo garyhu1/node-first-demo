@@ -1,6 +1,7 @@
 const Sequelize = require("sequelize");
 const config = require("./config");
 
+// 初始化sequelize ，设置一个连接池
 const sequelize = new Sequelize(config.database,config.username,config.password,{
     host: config.host,
     dialect: 'mysql',
@@ -10,6 +11,9 @@ const sequelize = new Sequelize(config.database,config.username,config.password,
         idle: 3000
     }
 });
+
+// 或者可以简单的使用一个连接 uri
+// const sequelize = new Sequelize('mysql://user:pass@your host:your port/dbname');
 
 // 定义model
 let Pet = sequelize.define('pet',{
@@ -26,6 +30,10 @@ let Pet = sequelize.define('pet',{
 },
 {
     timestamps: false
+});
+
+Pet.sync().then(res => {
+    console.log(JSON.stringify(res))
 });
 
 var now = Date.now();
@@ -109,4 +117,80 @@ let updateP = {
 
 // updatePet(updateP);
 
-deletePet("g-1561983506188");
+// deletePet("g-1561983506188");
+
+function findById(id) {
+    Pet.findOne({
+        where: {
+            id
+        }
+    })
+        .then(pet => {
+            console.log(JSON.stringify(pet))
+        })
+        .catch(err => {
+            console.log(err)
+        });
+}
+
+function findOrCreate(id) {
+    let now = Date.now();
+    // 查找，没有就创建一个
+    Pet.findOrCreate({
+        where: {
+            id
+        },
+        defaults: {
+            name: 'iven',
+            gender: 0,
+            birth: "1995-10-02",
+            createdAt: now,
+            updatedAt: now,
+            version: 0
+        }
+    })
+        .spread((pet,created) => {
+            console.log('PETS', JSON.stringify(pet));
+            console.log('PETS', created);
+        });
+}
+
+// findOrCreate("g-"+Date.now());
+
+function findAndCountAll() {
+    Pet.findAndCountAll({
+        where: {  
+        },
+        limit: 3,
+        offset: 2
+    })
+        .then(result => {
+            console.log('count', JSON.stringify(result.count));
+            console.log('row', JSON.stringify(result.rows));
+        })
+        .catch(err => {
+            console.log(JOSN.stringify(err));
+        });
+}
+
+// findAndCountAll();
+
+// 操作符使用失败
+function findAll() {
+    Pet.findAll({
+        where: {
+            // gender: [0,1] // 或者
+            'name': { // 这样写报错
+                $eq: "Gaffey"
+            }
+        }
+    })
+        .then(result => {
+            console.log('findall result', JSON.stringify(result));
+        })
+        .catch(err => {
+            console.log(err)
+        });
+}
+
+findAll();
