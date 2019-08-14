@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-    <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+    <!-- <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script> -->
     <title>splash</title>
     <style type="">
         * {
@@ -36,27 +36,27 @@
           position: fixed;
           bottom: 0;
           left: 0;
-          background-color: #fff;
+          background-color: #DE9531;
         }
 
         .btn {
           height: 30px;
           text-align: center;
           line-height: 30px;
-          width: 80px;
-          border-radius: 3px;
-          border: 1px solid #111;
+          width: 100%;
+          /*border-radius: 3px;
+          border: 1px solid #111;*/
         }
 
         #caseMarron{
           height:2rem;
-          width:3.5rem;
+          width: 100px;
           padding-top:10px;
           float:left;
           position:absolute;
           left:50%;
           top:50%;
-          transform:translate(-50%,-65%)
+          transform:translate(-50%,-65%);
         }
         #caseMarron #load{
           color:gray;
@@ -65,12 +65,12 @@
           margin-top:50px
         }
         #caseMarron #load p{
-          font-size:.35rem
+          font-size: 18px;
         }
 
         #boule{
-          height:.2rem;
-          width:.2rem;
+          height:.3rem;
+          width:.3rem;
           position:absolute;
           top:60%;
           left:0;
@@ -86,15 +86,15 @@
             opacity:0
           }
           50%{
-            height:.2rem;
-            width:.2rem;
+            height:.3rem;
+            width:.3rem;
             opacity:1
           }
           100%{
-            left:3.5rem;
+            left:100px;
             opacity:0;
-            height:.2rem;
-            width:.2rem
+            height:.3rem;
+            width:.3rem
           }
         }
         @-webkit-keyframes boule{
@@ -140,6 +140,73 @@
   </body>
 
   <script>
+    function handleOnlineStatusTrigger(event) {
+      console.log('网络判断');
+      // 联网状态
+      if (navigator.onLine) {
+        console.log('联网');
+        initJQuery();
+      // 断网状态
+      } else {
+        console.log('断网');
+      }
+    }
+
+    // 页面初始化
+    window.addEventListener('load', function() {
+      console.log('onload');
+      initJQuery();
+      // 加载数据
+      getPage();
+      // 联网监听
+      window.addEventListener('online',  handleOnlineStatusTrigger);
+      // 断网监听
+      window.addEventListener('offline', handleOnlineStatusTrigger);
+    });
+
+    // 初始化jquey
+    function initJQuery() {
+      var headEle = document.getElementsByTagName('head')[0];
+      var scriptEle = document.createElement('script');
+
+      scriptEle.type = 'text/javascript';
+      scriptEle.src = 'https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js';
+
+      headEle.appendChild(scriptEle);
+
+      // 不支持ie
+      scriptEle.onload = function() {
+        // 此时jq才被正式加载完成
+        $(document).ready(function(){
+          // 设置高度
+          $('.div-layout').css('height',window.screen.height);
+          $('body').on('touchmove',function(e){
+            e.preventDefault();
+          });
+          
+          // 展示
+          getPage();
+
+          $('#nextBtn').click(() => {
+            //判断是ios还是android的方法
+            var u = navigator.userAgent.toLowerCase();
+            var isApple = /(iphone|ipad|ipod|ios)/i.test(u);
+            var isAndroid = /android/i.test(u);
+            
+            if (isApple) {
+                //apple终端
+                window.location = 'jumpOut://';
+            } else if (isAndroid) {
+                //安卓终端
+                Mobile.jumpOut();
+            }
+          })
+
+        });
+      }
+    }
+
+    // 网络请求
     function getPage() {
       // 网络请求
       $.ajax({
@@ -148,17 +215,18 @@
           // alert('ok')
           setTimeout(() => {
             $('#caseMarron').css('display','none');
-          },1000);
+          },100);
           
           console.log(JSON.stringify(result));
           if(result){
-            result.open = false;
+            // result.open = false;
             if(result.open){
               let contentUrl = result.url;
               $('#succ_content').attr('src',contentUrl);
               $('.layout_1').css('display','block');
             }else {
-              let contentUrl = 'https://shimo.im/docs/Tlb557V6gToK3KMy/';
+              // let contentUrl = 'https://shimo.im/docs/Tlb557V6gToK3KMy/';
+              let contentUrl = './help.html';
               $('#fail_content').attr('src',contentUrl);
               $('.layout_2').css('display','block');
             }
@@ -173,34 +241,5 @@
       });
     }
 
-    $(document).ready(function(){
-      // 设置高度
-      $('.div-layout').css('height',window.screen.height);
-      $('body').on('touchmove',function(e){
-        e.preventDefault();
-      });
-      
-      // 展示
-      getPage();
-
-      $('#nextBtn').click(() => {
-        //判断是ios还是android的方法
-        var u = navigator.userAgent.toLowerCase();
-        var isApple = /(iphone|ipad|ipod|ios)/i.test(u);
-        var isAndroid = /android/i.test(u);
-        
-        if (isApple) {
-            //apple终端
-            window.location = 'jumpOut://';
-        } else if (isAndroid) {
-            //安卓终端
-            Mobile.jumpOut();
-        }
-      })
-
-      window.ononline = function() {
-        getPage();
-      }
-    });
   </script>
 </html>
