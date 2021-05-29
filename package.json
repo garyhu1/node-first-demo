@@ -28,7 +28,7 @@
         "mysql2": "^1.6.5",
         "rxjs": "^6.5.2",
         "sequelize": "^5.2.0",
-        "ws": "^7.1.0"
+        "ws": "^7.4.6"
     },
     "devDependencies": {
         "require-context": "^1.1.0",
